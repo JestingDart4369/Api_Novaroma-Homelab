@@ -1,17 +1,17 @@
 # Environment variables (contains API keys and secrets)
-.env
+legacy/.env
 .env.local
 .env.*.local
 # Keep .env.example (template file) in version control
 
 # Internal documentation (dev notes, checklists, migration docs)
-internal-docs/
+legacy/internal-docs/
 
 # Temporary files
-temp/
+legacy/temp/
 
 # Internal SDKs (real credentials)
-sdk_internal/
+legacy/sdk_internal/
 
 # SDK config files (real credentials)
 sdk/*/config.py
@@ -34,7 +34,7 @@ ENV/
 *.db
 *.sqlite
 *.sqlite3
-data/
+legacy/data/
 
 # IDE
 .idea/
@@ -56,3 +56,5 @@ logs/
 # OS files
 .DS_Store
 Thumbs.db
+/.claude/
+/.github/
