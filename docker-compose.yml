@@ -1,0 +1,30 @@
+services:
+  api-gateway:
+    build: .
+    container_name: api-gateway
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - gateway-data:/app/data
+    networks:
+      - gateway-net
+    # Optional for LAN testing (not required for Cloudflare Tunnel)
+    ports:
+      - "8080:8080"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - api-gateway
+    networks:
+      - gateway-net
+
+networks:
+  gateway-net:
+    driver: bridge
+
+volumes:
+  gateway-data:

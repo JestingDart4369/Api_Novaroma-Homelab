@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Gateway Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #D97706;
+            --primary-light: #FCD34D;
+            --primary-dark: #B45309;
+            --bg-gradient-start: #DC2626;
+            --bg-gradient-end: #EA580C;
+            --accent: #F59E0B;
+        }
+
+        /* Spring theme (March-May) */
+        body.spring {
+            --primary: #10B981;
+            --primary-light: #6EE7B7;
+            --primary-dark: #047857;
+            --bg-gradient-start: #059669;
+            --bg-gradient-end: #10B981;
+            --accent: #34D399;
+        }
+
+        /* Summer theme (June-August) */
+        body.summer {
+            --primary: #3B82F6;
+            --primary-light: #93C5FD;
+            --primary-dark: #1E40AF;
+            --bg-gradient-start: #0EA5E9;
+            --bg-gradient-end: #8B5CF6;
+            --accent: #06B6D4;
+        }
+
+        /* Autumn theme (September-November) */
+        body.autumn {
+            --primary: #D97706;
+            --primary-light: #FCD34D;
+            --primary-dark: #B45309;
+            --bg-gradient-start: #DC2626;
+            --bg-gradient-end: #EA580C;
+            --accent: #F59E0B;
+        }
+
+        /* Winter theme (December-February) */
+        body.winter {
+            --primary: #06B6D4;
+            --primary-light: #A5F3FC;
+            --primary-dark: #0E7490;
+            --bg-gradient-start: #0891B2;
+            --bg-gradient-end: #6366F1;
+            --accent: #38BDF8;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            transition: background 0.5s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .season-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+            z-index: 1000;
+        }
+
+        .header {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .header p strong {
+            color: var(--primary-dark);
+        }
+
+        .content {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 5px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .endpoint:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .endpoint h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+        }
+
+        .method.get {
+            background: var(--accent);
+            color: white;
+        }
+
+        .method.post {
+            background: var(--primary-dark);
+            color: white;
+        }
+
+        .method.put {
+            background: #7C3AED;
+            color: white;
+        }
+
+        .method.delete {
+            background: #DC2626;
+            color: white;
+        }
+
+        .method.patch {
+            background: #D97706;
+            color: white;
+        }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            color: #555;
+            font-size: 1.1rem;
+        }
+
+        .description {
+            margin-top: 0.75rem;
+            color: #666;
+        }
+
+        .params {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .params h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .param {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .param:last-child {
+            border-bottom: none;
+        }
+
+        .param-name {
+            font-family: 'Courier New', monospace;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .param-required {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 0.15rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .role-admin { background: #DBEAFE; color: #1E40AF; }
+        .role-super { background: #EDE9FE; color: #7C3AED; }
+        .role-root  { background: #FEE2E2; color: #DC2626; }
+
+        .footer {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            color: #666;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.2s ease;
+        }
+
+        .footer a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .quick-links {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .quick-link {
+            flex: 1;
+            min-width: 250px;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-decoration: none;
+            color: #333;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .quick-link:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .quick-link h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--primary-dark);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .quick-links {
+                flex-direction: column;
+            }
+
+            .quick-link {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="season-indicator" id="seasonIndicator">🍂 Autumn</div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🚀 API Gateway</h1>
+            <p>Centralized API proxy for weather, location, telephone, NASA, books, email, iOS automation, and grade tracking — with 4-level role-based access control</p>
+            <p><strong>Base URL:</strong> <code>https://api.novaroma-homelab.uk</code></p>
+        </div>
+
+        <div class="quick-links">
+            <a href="/docs" class="quick-link">
+                <h3>📖 Swagger UI</h3>
+                <p>Try out endpoints interactively</p>
+            </a>
+            <a href="/redoc" class="quick-link">
+                <h3>📚 ReDoc</h3>
+                <p>Detailed API reference</p>
+            </a>
+            <a href="/health" class="quick-link">
+                <h3>✅ Health Check</h3>
+                <p>Check API status</p>
+            </a>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- AUTHENTICATION                                                -->
+        <!-- ============================================================ -->
+        <div class="content">
+            <h2 class="section-title">Authentication</h2>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/auth/login</span>
+                </h3>
+                <p class="description">
+                    Get a JWT access token. Tokens expire after 1 hour. Include the token in all other requests via <code>Authorization: Bearer &lt;token&gt;</code>.
+                </p>
+                <div class="params">
+                    <h4>Request Body:</h4>
+                    <div class="param">
+                        <span class="param-name">username</span>
+                        <span class="param-required">required</span>
+                        <p>Your username</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">password</span>
+                        <span class="param-required">required</span>
+                        <p>Your password</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- WEATHER                                                       -->
+        <!-- ============================================================ -->
+        <div class="content">
+            <h2 class="section-title">Weather</h2>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/weather</span>
+                </h3>
+                <p class="description">
+                    Current weather for a city. Returns temperature, humidity, wind speed, and conditions.
+                </p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">city</span>
+                        <span class="param-required">required</span>
+                        <p>City name (e.g. "London", "New York")</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">units</span>
+                        <p>metric (default), imperial, or standard</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/weather/forecast/hourly</span>
+                </h3>
+                <p class="description">
+                    Hourly weather forecast for the next 48 hours. Requires coordinates.
+                </p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">lat</span>
+                        <span class="param-required">required</span>
+                        <p>Latitude</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">lon</span>
+                        <span class="param-required">required</span>
+                        <p>Longitude</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">units</span>
+                        <p>Units of measurement (default: metric)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/weather/forecast/daily</span>
+                </h3>
+                <p class="description">
+                    Daily weather forecast for up to 16 days. Requires coordinates.
+                </p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">lat</span>
+                        <span class="param-required">required</span>
+                        <p>Latitude</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">lon</span>
+                        <span class="param-required">required</span>
+                        <p>Longitude</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">cnt</span>
+                        <p>Number of days (1–16, default: 7)</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">units</span>
+                        <p>Units of measurement (default: metric)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- LOCATION                                                      -->
+        <!-- ============================================================ -->
+        <div class="content">
+            <h2 class="section-title">Location</h2>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/geo/geocode</span>
+                </h3>
+                <p class="description">
+                    Convert city names or addresses to geographic coordinates (latitude / longitude).
+                </p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">text</span>
+                        <span class="param-required">required</span>
+                        <p>City name or address to geocode</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/geo/ip</span>
+                </h3>
+                <p class="description">
+                    Get geographic location based on IP address. Detects country, region, city, and coordinates.
+                </p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">ip</span>
+                        <p>IP address to look up (optional — uses your IP if omitted)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TELEPHONE                                                     -->
+        <!-- ============================================================ -->
+        <div class="content">
+            <h2 class="section-title">Telephone Directory</h2>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/telephone/search</span>
+                </h3>
+                <p class="description">
+                    Search the Swiss telephone directory (search.ch) for people or businesses. Returns results as XML.
+                </p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">was</span>
+                        <span class="param-required">required</span>
+                        <p>Name to search for (person or business)</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">wo</span>
+                        <p>Location filter (city or canton)</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">maxnum</span>
+                        <p>Max results (capped at 200)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- NASA                                                          -->
+        <!-- ============================================================ -->
+        <div class="content">
+            <h2 class="section-title">NASA</h2>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/nasa/apod</span>
+                </h3>
+                <p class="description">
+                    NASA Astronomy Picture of the Day. Returns the image URL, title, and explanation.
+                </p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">date</span>
+                        <p>Date in YYYY-MM-DD format (default: today)</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">hd</span>
+                        <p>Return high-definition image URL (true / false)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/nasa/epic/{collection}</span>
+                </h3>
+                <p class="description">
+                    Earth satellite images from NASA's EPIC camera. <code>collection</code> is <code>natural</code> or <code>enhanced</code>.
+                </p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">date</span>
+                        <p>Date in YYYY-MM-DD format (default: most recent available)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/nasa/epic/{collection}/available</span>
+                </h3>
+                <p class="description">
+                    List all dates that have EPIC imagery available for the given collection.
+                </p>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- LIBRARY                                                       -->
+        <!-- ============================================================ -->
+        <div class="content">
+            <h2 class="section-title">Library</h2>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/library/search</span>
+                </h3>
+                <p class="description">
+                    Search Open Library for books, authors, or works.
+                </p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">q</span>
+                        <span class="param-required">required</span>
+                        <p>Search query</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">author</span>
+                        <p>Filter by author name</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">limit</span>
+                        <p>Max results (default: 10)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/library/books</span>
+                </h3>
+                <p class="description">
+                    Get book details by ISBN or Open Library ID.
+                </p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">bibkeys</span>
+                        <span class="param-required">required</span>
+                        <p>Comma-separated keys (e.g. <code>ISBN:0451526538</code>)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/library/covers/{type}/{identifier}</span>
+                </h3>
+                <p class="description">
+                    Get a book cover image. <code>type</code> is <code>b</code> (book), <code>a</code> (author), or <code>w</code> (work).
+                </p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">size</span>
+                        <p>S, M (default), or L</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/library/authors/{author_id}</span>
+                </h3>
+                <p class="description">
+                    Get author details by Open Library author ID (e.g. <code>OL26320A</code>).
+                </p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/library/subjects/{subject}</span>
+                </h3>
+                <p class="description">
+                    Browse books by subject (e.g. <code>science_fiction</code>, <code>history</code>).
+                </p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">limit</span>
+                        <p>Max results (default: 20)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/library/works/{work_id}</span>
+                </h3>
+                <p class="description">
+                    Get work information by Open Library work ID (e.g. <code>OL27516M</code>).
+                </p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/library/archive/*</span>
+                </h3>
+                <p class="description">
+                    Internet Archive S3-compatible API proxy. Covers, metadata, and bulk data access.
+                </p>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- EMAIL                                                         -->
+        <!-- ============================================================ -->
+        <div class="content">
+            <h2 class="section-title">Email</h2>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/email/send</span>
+                </h3>
+                <p class="description">
+                    Send an email via Resend. Full control over sender and recipients. API key is stored server-side.
+                </p>
+                <div class="params">
+                    <h4>Request Body:</h4>
+                    <div class="param">
+                        <span class="param-name">to</span>
+                        <span class="param-required">required</span>
+                        <p>Array of recipient addresses (e.g. <code>["user@example.com"]</code>)</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">subject</span>
+                        <span class="param-required">required</span>
+                        <p>Email subject</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">html</span>
+                        <span class="param-required">required</span>
+                        <p>Email body in HTML</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">from_email</span>
+                        <p>Sender (optional, e.g. <code>"App &lt;app@example.com&gt;"</code>)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/email/send-simple</span>
+                </h3>
+                <p class="description">
+                    Simplified email — domain is pre-configured server-side, just provide usernames.
+                </p>
+                <div class="params">
+                    <h4>Request Body:</h4>
+                    <div class="param">
+                        <span class="param-name">to_users</span>
+                        <span class="param-required">required</span>
+                        <p>Array of usernames (e.g. <code>["john"]</code> → john@your-domain.com)</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">subject</span>
+                        <span class="param-required">required</span>
+                        <p>Email subject</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">html</span>
+                        <span class="param-required">required</span>
+                        <p>Email body in HTML</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">from_name</span>
+                        <p>Sender display name (optional)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- RATE LIMITS                                                   -->
+        <!-- ============================================================ -->
+        <div class="content">
+            <h2 class="section-title">Rate Limits</h2>
+            <p style="color: #666; margin-bottom: 1rem;">
+                Every request is rate-limited at two layers: your <strong>role limit</strong> (requests / hour) and per-<strong>API quota</strong> (shared across all users). Current limits are returned in <code>X-RateLimit-*</code> response headers.
+            </p>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/rate-limits/me</span>
+                </h3>
+                <p class="description">
+                    Your current rate limit status: how many calls you have used and how many remain this hour.
+                </p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/rate-limits/apis</span>
+                </h3>
+                <p class="description">
+                    Current quota usage for every external API (NASA, OpenWeather, etc.).
+                </p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/rate-limits/all</span>
+                    <span class="role-badge role-admin">admin+</span>
+                </h3>
+                <p class="description">
+                    Full overview: all role limits and all API quotas.
+                </p>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- HEALTH MONITORING                                             -->
+        <!-- ============================================================ -->
+        <div class="content">
+            <h2 class="section-title">Health Monitoring</h2>
+            <p style="color: #666; margin-bottom: 1rem;">
+                Push-based health monitoring for custom software and hardware. Devices call in their own status via heartbeat endpoints, and clients read the aggregated health dashboard. Supports a <strong>three-tier control system</strong> for flexible device management.
+            </p>
+
+            <!-- Three-tier control explanation -->
+            <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <h3 style="color: #333; margin-bottom: 1rem; font-size: 1.1rem;">🎯 Three-Tier Control System</h3>
+                <div style="margin-left: 1rem;">
+                    <p style="margin-bottom: 0.75rem;">
+                        <strong style="color: var(--primary);">1. server_enabled</strong> (Hard Block)
+                        <br><span style="color: #666; font-size: 0.95rem;">Server-side API blocking. When false → 503 response, nothing gets through. Complete shutdown.</span>
+                    </p>
+                    <p style="margin-bottom: 0.75rem;">
+                        <strong style="color: var(--primary);">2. is_active</strong> (Soft Signal)
+                        <br><span style="color: #666; font-size: 0.95rem;">Device-side signal. Device sees this in heartbeat response and can stop itself. Heartbeats still transmit.</span>
+                    </p>
+                    <p style="margin-bottom: 0;">
+                        <strong style="color: var(--primary);">3. health</strong> (Self-Report)
+                        <br><span style="color: #666; font-size: 0.95rem;">Device reports own status: <code>ok</code>, <code>warning</code>, <code>error</code>, or <code>killed</code>. Full client control.</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Software Health -->
+            <h3 style="color: #555; margin-bottom: 1rem; font-size: 1.2rem;">💻 Software Health</h3>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/software</span>
+                </h3>
+                <p class="description">
+                    List all registered software with health status, last heartbeat time, and staleness indicator (stale if no heartbeat in 5 minutes).
+                </p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/software/{name}</span>
+                </h3>
+                <p class="description">
+                    Get health status for one software service.
+                </p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/software/{name}/heartbeat</span>
+                </h3>
+                <p class="description">
+                    Software pushes its own heartbeat. Must be registered first via <code>/settings/software</code>.
+                </p>
+                <div class="params">
+                    <h4>Request Body:</h4>
+                    <div class="param">
+                        <span class="param-name">health</span>
+                        <span class="param-required">required</span>
+                        <p>ok, warning, error, or killed</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">details</span>
+                        <p>Custom JSON data (version, uptime, status, etc.)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hardware Health -->
+            <h3 style="color: #555; margin: 1.5rem 0 1rem; font-size: 1.2rem;">🔧 Hardware Health</h3>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/hardware</span>
+                </h3>
+                <p class="description">
+                    List all registered hardware devices with health status, config, and staleness indicator.
+                </p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/hardware/{name}</span>
+                </h3>
+                <p class="description">
+                    Get health status and config for one hardware device.
+                </p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/hardware/{name}/heartbeat</span>
+                </h3>
+                <p class="description">
+                    Device pushes heartbeat with optional config and details. Must be registered first via <code>/settings/hardware</code>.
+                </p>
+                <div class="params">
+                    <h4>Request Body:</h4>
+                    <div class="param">
+                        <span class="param-name">health</span>
+                        <span class="param-required">required</span>
+                        <p>ok, warning, error, or killed</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">config</span>
+                        <p>Device config (IP, firmware, location, etc.)</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">details</span>
+                        <p>Custom JSON data (CPU temp, uptime, status, etc.)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- GRADES                                                        -->
+        <!-- ============================================================ -->
+        <div class="content">
+            <h2 class="section-title">Grades</h2>
+            <p style="color: #666; margin-bottom: 1rem;">
+                Proxy for the <a href="https://api.sercraft.ch/documentation" target="_blank">sercraft.ch Grade Tracker API</a>.
+                Login first to get an <code>X-Grade-Token</code>, then include it in all subsequent grade requests.
+            </p>
+
+            <!-- User Account -->
+            <h3 style="color: #555; margin-bottom: 1rem; font-size: 1.2rem;">👤 Account</h3>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/grade/user/auth</span>
+                </h3>
+                <p class="description">Login to the grade tracker. Returns an <code>X-Grade-Token</code> to use in all other grade requests.</p>
+                <div class="params">
+                    <h4>Request Body:</h4>
+                    <div class="param">
+                        <span class="param-name">user</span>
+                        <span class="param-required">required</span>
+                        <p>Grade tracker username</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">password</span>
+                        <span class="param-required">required</span>
+                        <p>Grade tracker password</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/grade/user</span>
+                </h3>
+                <p class="description">Register a new grade tracker account.</p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">username</span>
+                        <span class="param-required">required</span>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">password</span>
+                        <span class="param-required">required</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/grade/user</span>
+                </h3>
+                <p class="description">Get current grade tracker user profile.</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method patch">PATCH</span>
+                    <span class="endpoint-path">/grade/user</span>
+                </h3>
+                <p class="description">Change username or password. Provide <code>new_password</code> or <code>new_username</code> along with current <code>password</code>.</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method delete">DELETE</span>
+                    <span class="endpoint-path">/grade/user</span>
+                </h3>
+                <p class="description">Delete the grade tracker account.</p>
+            </div>
+
+            <!-- Subjects -->
+            <h3 style="color: #555; margin: 1.5rem 0 1rem; font-size: 1.2rem;">📚 Subjects</h3>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/grade/subjects</span>
+                </h3>
+                <p class="description">List all subjects. Pass <code>subject_id</code> to get a single subject.</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/grade/subjects</span>
+                </h3>
+                <p class="description">Create a new subject.</p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">name</span>
+                        <span class="param-required">required</span>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">average</span>
+                        <p>Initial average</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">points</span>
+                        <p>Initial points</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">num_exams</span>
+                        <p>Number of exams</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method put">PUT</span>
+                    <span class="endpoint-path">/grade/subjects</span>
+                </h3>
+                <p class="description">Update a subject's name or average. Requires <code>subject_id</code>.</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method delete">DELETE</span>
+                    <span class="endpoint-path">/grade/subjects</span>
+                </h3>
+                <p class="description">Delete a subject. Requires <code>subject_id</code>.</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/grade/subjects/exams</span>
+                </h3>
+                <p class="description">Get all exams for a specific subject. Requires <code>subject_id</code>.</p>
+            </div>
+
+            <!-- Exams -->
+            <h3 style="color: #555; margin: 1.5rem 0 1rem; font-size: 1.2rem;">📝 Exams</h3>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/grade/exam</span>
+                </h3>
+                <p class="description">List all exams. Pass <code>exam_id</code> to get a single exam.</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/grade/exams</span>
+                </h3>
+                <p class="description">Create a new exam entry.</p>
+                <div class="params">
+                    <h4>Query Parameters:</h4>
+                    <div class="param">
+                        <span class="param-name">subject_id</span>
+                        <span class="param-required">required</span>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">name</span>
+                        <span class="param-required">required</span>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">grade</span>
+                        <span class="param-required">required</span>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">weight</span>
+                        <span class="param-required">required</span>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">details</span>
+                        <span class="param-required">required</span>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">date</span>
+                        <p>YYYY-MM-DD (defaults to today)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method put">PUT</span>
+                    <span class="endpoint-path">/grade/exams</span>
+                </h3>
+                <p class="description">Update an exam. Requires <code>exam_id</code> and at least one field to change.</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method delete">DELETE</span>
+                    <span class="endpoint-path">/grade/exams</span>
+                </h3>
+                <p class="description">Delete an exam. Requires <code>exam_id</code>.</p>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- SETTINGS (ADMIN)                                              -->
+        <!-- ============================================================ -->
+        <div class="content">
+            <h2 class="section-title">Settings</h2>
+            <p style="color: #666; margin-bottom: 1rem;">
+                Live configuration — changes take effect immediately, no server restart needed. Role badges show the <em>minimum</em> role required.
+            </p>
+
+            <!-- Users -->
+            <h3 style="color: #555; margin-bottom: 1rem; font-size: 1.2rem;">👤 Users</h3>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/settings/users</span>
+                    <span class="role-badge role-admin">admin+</span>
+                </h3>
+                <p class="description">List all user accounts.</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/settings/users</span>
+                    <span class="role-badge role-admin">admin+</span>
+                </h3>
+                <p class="description">Create a new user.</p>
+                <div class="params">
+                    <h4>Request Body:</h4>
+                    <div class="param">
+                        <span class="param-name">username</span>
+                        <span class="param-required">required</span>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">password</span>
+                        <span class="param-required">required</span>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">role</span>
+                        <p>user, admin, superAdmin, or Root (default: user)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/settings/users/{id}/enable</span>
+                    <span class="role-badge role-admin">admin+</span>
+                </h3>
+                <p class="description">Re-enable a disabled user account.</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/settings/users/{id}/disable</span>
+                    <span class="role-badge role-admin">admin+</span>
+                </h3>
+                <p class="description">Disable a user account (blocks login). Cannot disable your own account.</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method put">PUT</span>
+                    <span class="endpoint-path">/settings/users/{id}</span>
+                    <span class="role-badge role-super">superAdmin+</span>
+                </h3>
+                <p class="description">Change a user's role or password.</p>
+                <div class="params">
+                    <h4>Request Body (all optional):</h4>
+                    <div class="param">
+                        <span class="param-name">role</span>
+                        <p>New role (user, admin, superAdmin, Root)</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">password</span>
+                        <p>New password</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method delete">DELETE</span>
+                    <span class="endpoint-path">/settings/users/{id}</span>
+                    <span class="role-badge role-root">Root</span>
+                </h3>
+                <p class="description">Permanently delete a user. Cannot delete your own account.</p>
+            </div>
+
+            <!-- APIs -->
+            <h3 style="color: #555; margin: 1.5rem 0 1rem; font-size: 1.2rem;">⚙️ APIs</h3>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/settings/apis</span>
+                    <span class="role-badge role-admin">admin+</span>
+                </h3>
+                <p class="description">List all API configurations (name, active status, max calls / hour).</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/settings/apis/{name}</span>
+                    <span class="role-badge role-admin">admin+</span>
+                </h3>
+                <p class="description">Get config for a single API (e.g. <code>nasa</code>, <code>openweather</code>).</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method put">PUT</span>
+                    <span class="endpoint-path">/settings/apis/{name}</span>
+                    <span class="role-badge role-super">superAdmin+</span>
+                </h3>
+                <p class="description">Toggle an API on/off or change its hourly call limit.</p>
+                <div class="params">
+                    <h4>Request Body (all optional):</h4>
+                    <div class="param">
+                        <span class="param-name">is_active</span>
+                        <p>true or false</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">max_calls_per_hour</span>
+                        <p>New quota limit</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roles -->
+            <h3 style="color: #555; margin: 1.5rem 0 1rem; font-size: 1.2rem;">🛡️ Roles</h3>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/settings/roles</span>
+                    <span class="role-badge role-admin">admin+</span>
+                </h3>
+                <p class="description">List all roles and their hourly request limits.</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method put">PUT</span>
+                    <span class="endpoint-path">/settings/roles/{role}</span>
+                    <span class="role-badge role-root">Root</span>
+                </h3>
+                <p class="description">Change a role's max calls per hour or active status.</p>
+                <div class="params">
+                    <h4>Request Body (all optional):</h4>
+                    <div class="param">
+                        <span class="param-name">max_calls_per_hour</span>
+                        <p>New limit</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">is_active</span>
+                        <p>true or false</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Software Settings -->
+            <h3 style="color: #555; margin: 1.5rem 0 1rem; font-size: 1.2rem;">💻 Software</h3>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/settings/software</span>
+                    <span class="role-badge role-admin">admin+</span>
+                </h3>
+                <p class="description">List all registered software entries with active status.</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/settings/software</span>
+                    <span class="role-badge role-admin">admin+</span>
+                </h3>
+                <p class="description">Register a new software entry for health monitoring.</p>
+                <div class="params">
+                    <h4>Request Body:</h4>
+                    <div class="param">
+                        <span class="param-name">name</span>
+                        <span class="param-required">required</span>
+                        <p>Unique software name (e.g. <code>python-cli-tools</code>)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method put">PUT</span>
+                    <span class="endpoint-path">/settings/software/{name}</span>
+                    <span class="role-badge role-super">superAdmin+</span>
+                </h3>
+                <p class="description">Toggle software active status or server-side blocking (three-tier control).</p>
+                <div class="params">
+                    <h4>Request Body (all optional):</h4>
+                    <div class="param">
+                        <span class="param-name">is_active</span>
+                        <p>Device-side signal (soft block)</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">server_enabled</span>
+                        <p>Server-side blocking (hard block via 503)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method delete">DELETE</span>
+                    <span class="endpoint-path">/settings/software/{name}</span>
+                    <span class="role-badge role-root">Root</span>
+                </h3>
+                <p class="description">Permanently delete a software entry.</p>
+            </div>
+
+            <!-- Hardware Settings -->
+            <h3 style="color: #555; margin: 1.5rem 0 1rem; font-size: 1.2rem;">🔧 Hardware</h3>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/settings/hardware</span>
+                    <span class="role-badge role-admin">admin+</span>
+                </h3>
+                <p class="description">List all registered hardware devices with config and active status.</p>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/settings/hardware</span>
+                    <span class="role-badge role-admin">admin+</span>
+                </h3>
+                <p class="description">Register a new hardware device for health monitoring.</p>
+                <div class="params">
+                    <h4>Request Body:</h4>
+                    <div class="param">
+                        <span class="param-name">name</span>
+                        <span class="param-required">required</span>
+                        <p>Unique device name (e.g. <code>router-hall</code>)</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">config</span>
+                        <p>Initial device config (JSON object)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method put">PUT</span>
+                    <span class="endpoint-path">/settings/hardware/{name}</span>
+                    <span class="role-badge role-super">superAdmin+</span>
+                </h3>
+                <p class="description">Update device config, active status, or server-side blocking (three-tier control).</p>
+                <div class="params">
+                    <h4>Request Body (all optional):</h4>
+                    <div class="param">
+                        <span class="param-name">config</span>
+                        <p>Device configuration (pushed to device on next heartbeat)</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">is_active</span>
+                        <p>Device-side signal (soft block)</p>
+                    </div>
+                    <div class="param">
+                        <span class="param-name">server_enabled</span>
+                        <p>Server-side blocking (hard block via 503)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <h3>
+                    <span class="method delete">DELETE</span>
+                    <span class="endpoint-path">/settings/hardware/{name}</span>
+                    <span class="role-badge role-root">Root</span>
+                </h3>
+                <p class="description">Permanently delete a hardware device entry.</p>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- FOOTER                                                        -->
+        <!-- ============================================================ -->
+        <div class="footer">
+            <p>© 2026 <strong>JestingDart4369</strong> | API Gateway</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="https://github.com/JestingDart4369/ApiServer_Novaroma" target="_blank">GitHub Repository</a> |
+                <a href="https://github.com/JestingDart4369/ApiServer_Novaroma/wiki" target="_blank">Wiki</a> |
+                <a href="https://github.com/JestingDart4369/ApiServer_Novaroma/issues" target="_blank">Issues</a>
+            </p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+                Built with <a href="https://fastapi.tiangolo.com/" target="_blank">FastAPI</a> |
+                Deployed with <a href="https://www.cloudflare.com/products/tunnel/" target="_blank">Cloudflare Tunnel</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function applySeason() {
+            const month = new Date().getMonth() + 1;
+            let season, emoji;
+
+            if (month >= 3 && month <= 5) {
+                season = 'spring';
+                emoji = '🌸';
+            } else if (month >= 6 && month <= 8) {
+                season = 'summer';
+                emoji = '☀️';
+            } else if (month >= 9 && month <= 11) {
+                season = 'autumn';
+                emoji = '🍂';
+            } else {
+                season = 'winter';
+                emoji = '❄️';
+            }
+
+            document.body.className = season;
+            document.getElementById('seasonIndicator').textContent =
+                `${emoji} ${season.charAt(0).toUpperCase() + season.slice(1)}`;
+        }
+
+        applySeason();
+    </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+# Environment variables (contains API keys and secrets)
+.env
+.env.local
+.env.*.local
+# Keep .env.example (template file) in version control
+
+# Internal documentation (dev notes, checklists, migration docs)
+internal-docs/
+
+# Temporary files
+temp/
+
+# Internal SDKs (real credentials)
+sdk_internal/
+
+# SDK config files (real credentials)
+sdk/*/config.py
+sdk/*/settings.json
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+data/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
