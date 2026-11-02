@@ -87,7 +87,7 @@ async def send_email(
         })
         return {"success": True, "email_id": result.get("id"), "to": body.to, "user": user.username}
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Failed to send email: {str(e)}")
+        raise HTTPException(status_code=502, detail="Failed to send email") from None
 
 
 # --- Simplified email (domain pre-configured, caller only gives usernames) ---
@@ -129,4 +129,4 @@ async def send_simple_email(
         })
         return {"success": True, "email_id": result.get("id"), "to": to_addresses, "from": from_email, "user": user.username}
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Failed to send email: {str(e)}")
+        raise HTTPException(status_code=502, detail="Failed to send email") from None

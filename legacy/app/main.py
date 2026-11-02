@@ -1,8 +1,10 @@
 import os
 import sys
+import httpx
 from pathlib import Path
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.exceptions import RequestValidationError
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
@@ -12,7 +14,7 @@ from app.db import Base, engine
 from app.deps import get_db
 from app.models import User, ApiConfig, RoleLimits
 from app.config import load_all_api_configs, load_all_role_configs
-from app.auth import hash_password, verify_login, create_token
+from app.auth import hash_password, verify_login, create_token, check_login_budget, get_pepper, validate_jwt_secret
 from app.notifications import notify_startup_error, notify_startup_success
 from app.routes.settings import router as settings_router
 from app.routes.weather import router as weather_router
@@ -37,12 +39,29 @@ app = FastAPI(
 )
 
 
+@app.exception_handler(RequestValidationError)
+async def validation_error(request, exc):
+    # Pydantic's default "input" and context may contain passwords/tokens.
+    return JSONResponse(status_code=422, content={'detail': [
+        {'loc': error['loc'], 'type': error['type'], 'msg': 'Invalid request value'}
+        for error in exc.errors()
+    ]})
+
+
+@app.exception_handler(httpx.RequestError)
+async def upstream_transport_error(request, exc):
+    # Handled exceptions avoid logging URLs with provider keys in tracebacks.
+    return JSONResponse(status_code=502, content={'detail': 'Upstream service unavailable'})
+
+
 def initialize_server():
     """
     Initialize server: create tables, bootstrap admin, send startup notification.
     Sends email alert if initialization fails.
     """
     try:
+        validate_jwt_secret()
+        get_pepper()
         # Create tables
         Base.metadata.create_all(bind=engine)
 
@@ -86,7 +105,7 @@ def initialize_server():
         print("[SERVER] API Gateway started successfully")
 
     except Exception as e:
-        print(f"[CRITICAL] Server initialization failed: {e}")
+        print(f"[CRITICAL] Server initialization failed: {type(e).__name__}")
         notify_startup_error(e)
         sys.exit(1)
 
@@ -109,9 +128,13 @@ def health():
 
 #Login for accounts
 @app.post("/auth/login", tags=["auth"])
-def login(body: dict, db: Session = Depends(get_db)):
+def login(body: dict, request: Request, db: Session = Depends(get_db)):
     username = body.get("username", "")
     password = body.get("password", "")
+    if (not isinstance(username, str) or not isinstance(password, str)
+            or len(username) > 50 or len(password.encode('utf-8')) > 16384):
+        raise HTTPException(400, 'Invalid login data')
+    check_login_budget(db.get_bind(), username, request)
     user = verify_login(db, username, password)
     return {"access_token": create_token(user), "token_type": "bearer"}
 

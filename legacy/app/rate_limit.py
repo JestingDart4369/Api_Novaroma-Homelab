@@ -4,7 +4,7 @@
 import time
 import logging
 from typing import Dict, Tuple
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from collections import defaultdict
 from threading import Lock
 from fastapi import Request, HTTPException, Depends
@@ -61,7 +61,7 @@ class RateLimitStore:
         self.last_cleanup = time.time()
 
     def _get_hour_key(self) -> str:
-        return datetime.utcnow().strftime("%Y-%m-%d-%H")
+        return datetime.now(timezone.utc).strftime("%Y-%m-%d-%H")
 
     def _cleanup_if_needed(self):
         now = time.time()
@@ -70,7 +70,7 @@ class RateLimitStore:
             self.last_cleanup = now
 
     def _cleanup_expired(self):
-        cutoff_key = (datetime.utcnow() - timedelta(hours=2)).strftime("%Y-%m-%d-%H")
+        cutoff_key = (datetime.now(timezone.utc) - timedelta(hours=2)).strftime("%Y-%m-%d-%H")
 
         for user_id in list(self.user_requests.keys()):
             expired = [h for h in self.user_requests[user_id] if h < cutoff_key]
@@ -92,7 +92,7 @@ class RateLimitStore:
             self._cleanup_if_needed()
             hour_key = self._get_hour_key()
             count = self.user_requests[user_id].get(hour_key, 0)
-            next_hour = datetime.utcnow().replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+            next_hour = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
             reset = int(next_hour.timestamp())
 
             if count >= limit:
@@ -107,7 +107,7 @@ class RateLimitStore:
             self._cleanup_if_needed()
             hour_key = self._get_hour_key()
             count = self.api_requests[api_name].get(hour_key, 0)
-            next_hour = datetime.utcnow().replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+            next_hour = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
             reset = int(next_hour.timestamp())
 
             if count >= limit:

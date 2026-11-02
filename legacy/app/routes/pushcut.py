@@ -81,16 +81,8 @@ async def _pushcut_request(method: str, path: str, params: dict = None, json: di
         # 204 No Content returns empty body
         return r.status_code, r.json() if r.status_code != 204 else {"success": True}
 
-    # Handle errors
-    try:
-        error_detail = r.json()
-    except:
-        error_detail = {"error": r.text}
-
-    raise HTTPException(
-        status_code=502,
-        detail=f"Pushcut API failed ({r.status_code}): {error_detail}"
-    )
+    # Do not expose provider response bodies: they may echo request credentials.
+    raise HTTPException(status_code=502, detail="Pushcut API failed")
 
 # ============================================================
 # ENDPOINTS

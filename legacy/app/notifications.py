@@ -3,7 +3,7 @@ Email notification system for server errors and critical events.
 Sends alerts to admin email configured in .env
 """
 import os
-import traceback
+from html import escape
 from typing import Optional
 import resend
 
@@ -19,12 +19,13 @@ def send_admin_alert(subject: str, body: str, error: Optional[Exception] = None)
         error: Optional exception to include in the email
     """
     admin_email = os.environ.get("ADMIN_EMAIL")
+    subject, body = escape(subject), escape(body)
     server_from = os.environ.get("SERVER_FROM_EMAIL", "API Server <apiserver@api.novaroma-homelab.uk>")
 
     if not admin_email:
         print(f"[ALERT] {subject}: {body}")
         if error:
-            print(f"[ERROR] {error}")
+            print(f"[ERROR] {type(error).__name__}")
         return
 
     # Build email HTML
@@ -37,8 +38,8 @@ def send_admin_alert(subject: str, body: str, error: Optional[Exception] = None)
     """
 
     if error:
-        error_details = traceback.format_exception(type(error), error, error.__traceback__)
-        error_text = "".join(error_details)
+        # Exception strings and tracebacks may contain URLs/API keys/passwords.
+        error_text = escape(type(error).__name__)
         html_body += f"""
             <div style="background: #f8f9fa; padding: 15px; margin-top: 20px; border-left: 4px solid #dc3545;">
                 <h4 style="margin-top: 0;">Error Details:</h4>
@@ -65,10 +66,10 @@ def send_admin_alert(subject: str, body: str, error: Optional[Exception] = None)
         resend.Emails.send(params)
         print(f"[ALERT SENT] {subject}")
     except Exception as e:
-        print(f"[FAILED TO SEND ALERT] {subject}: {e}")
+        print(f"[FAILED TO SEND ALERT] {subject}: {type(e).__name__}")
         print(f"[ORIGINAL ERROR] {body}")
         if error:
-            print(f"[ERROR DETAILS] {error}")
+            print(f"[ERROR DETAILS] {type(error).__name__}")
 
 
 def notify_startup_error(error: Exception):

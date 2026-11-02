@@ -4,6 +4,7 @@
 import os
 import re
 import logging
+from urllib.parse import quote
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import Response
@@ -84,6 +85,14 @@ def validate_file_path(file_path: str) -> str:
     return file_path
 
 # ============================================================
+def archive_url(bucket: str, file_path: str) -> str:
+    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,99}', bucket) or '..' in bucket:
+        raise HTTPException(400, 'Invalid archive bucket')
+    if '\\' in file_path or any(ord(c) < 32 for c in file_path):
+        raise HTTPException(400, 'Invalid archive path')
+    return f'https://s3.us.archive.org/{bucket}/{quote(validate_file_path(file_path), safe="/")}'
+
+
 # ENDPOINTS — OPEN LIBRARY
 # ============================================================
 
@@ -275,9 +284,9 @@ async def get_archive_file(
     _api_limit: None = Depends(check_library_limit),
 ):
     file_path = validate_file_path(file_path)
-    url = f"https://s3.us.archive.org/{bucket}/{file_path}"
+    url = archive_url(bucket, file_path)
 
-    async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
+    async with httpx.AsyncClient(timeout=30, follow_redirects=False) as client:
         r = await client.get(url)
 
     if r.status_code != 200:
@@ -297,9 +306,9 @@ async def get_archive_metadata(
     _api_limit: None = Depends(check_library_limit),
 ):
     file_path = validate_file_path(file_path)
-    url = f"https://s3.us.archive.org/{bucket}/{file_path}"
+    url = archive_url(bucket, file_path)
 
-    async with httpx.AsyncClient(timeout=10, follow_redirects=True) as client:
+    async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
         r = await client.head(url)
 
     if r.status_code != 200:
@@ -329,13 +338,13 @@ async def delete_archive_file(
     if not S3_KEY or not S3_SECRET:
         raise HTTPException(status_code=503, detail="S3 credentials not configured")
 
-    url = f"https://s3.us.archive.org/{bucket}/{file_path}"
+    url = archive_url(bucket, file_path)
     headers = {"Authorization": f"LOW {S3_KEY}:{S3_SECRET}"}
 
     if cascade:
         headers["x-archive-cascade-delete"] = "1"
 
-    async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
+    async with httpx.AsyncClient(timeout=30, follow_redirects=False) as client:
         r = await client.delete(url, headers=headers)
 
     if r.status_code not in (200, 204):

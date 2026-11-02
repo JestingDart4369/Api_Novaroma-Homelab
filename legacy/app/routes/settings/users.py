@@ -2,18 +2,25 @@
 # IMPORTS
 # ============================================================
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from sqlalchemy.orm import Session
 from app.deps import get_db
 from app.models import User
-from app.auth import hash_password
+from app.auth import hash_password, invalidate_tokens
 from app.security import require_admin, require_super_admin, require_root
 
 # ============================================================
 # ROUTER SETUP
 # ============================================================
 router = APIRouter(prefix="/users")
+
+ROLE_RANK = {'user': 0, 'admin': 1, 'superAdmin': 2, 'Root': 3}
+
+
+def guard_management(actor: User, target_role: str):
+    if actor.role != 'Root' and ROLE_RANK.get(target_role, 99) >= ROLE_RANK.get(actor.role, -1):
+        raise HTTPException(403, 'Cannot manage an equal or higher privileged account')
 
 # ============================================================
 # ROUTE SCHEMA
@@ -31,13 +38,13 @@ router = APIRouter(prefix="/users")
 # PYDANTIC MODELS
 # ============================================================
 class UserCreate(BaseModel):
-    username: str
-    password: str
+    username: str = Field(min_length=1, max_length=50)
+    password: str = Field(min_length=12, max_length=4096)
     role: str = "user"  # default role for new users
 
 class UserUpdate(BaseModel):
     role: Optional[str] = None
-    password: Optional[str] = None
+    password: Optional[str] = Field(default=None, min_length=12, max_length=4096)
 
 class UserResponse(BaseModel):
     id: int
@@ -87,6 +94,8 @@ def create_user(
     if db.query(User).filter(User.username == body.username.strip()).first():
         raise HTTPException(status_code=409, detail="Username already exists")
 
+    guard_management(admin, body.role)
+
     user = User(
         username=body.username.strip(),
         password_hash=hash_password(body.password),
@@ -115,13 +124,20 @@ def update_user(
     if user_id == super_admin.id and body.role is not None:
         raise HTTPException(status_code=400, detail="Cannot change your own role")
 
+    if user_id != super_admin.id:
+        guard_management(super_admin, user.role)
+
     if body.role is not None:
         if body.role not in ("user", "admin", "superAdmin", "Root"):
             raise HTTPException(status_code=400, detail="Invalid role. Must be: user, admin, superAdmin, Root")
+        guard_management(super_admin, body.role)
         user.role = body.role
 
     if body.password is not None:
         user.password_hash = hash_password(body.password)
+
+    if body.password is not None or body.role is not None:
+        invalidate_tokens(db, user)
 
     db.commit()
     db.refresh(user)
@@ -138,7 +154,9 @@ def enable_user(
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    guard_management(admin, user.role)
     user.is_active = True
+    invalidate_tokens(db, user)
     db.commit()
     return {"id": user.id, "username": user.username, "is_active": True}
 
@@ -158,7 +176,9 @@ def disable_user(
     if user_id == admin.id:
         raise HTTPException(status_code=400, detail="Cannot disable your own account")
 
+    guard_management(admin, user.role)
     user.is_active = False
+    invalidate_tokens(db, user)
     db.commit()
     return {"id": user.id, "username": user.username, "is_active": False}
 

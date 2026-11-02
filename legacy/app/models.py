@@ -4,6 +4,18 @@ from sqlalchemy import String, Boolean, Integer, DateTime, JSON
 from sqlalchemy.orm import Mapped, mapped_column
 from app.db import Base
 
+class LoginAttempt(Base):
+    __tablename__ = "login_attempts"
+    key: Mapped[str] = mapped_column(String(80), primary_key=True)
+    window: Mapped[int] = mapped_column(Integer)
+    count: Mapped[int] = mapped_column(Integer)
+
+class TokenState(Base):
+    __tablename__ = 'token_state'
+    user_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    nonce: Mapped[str] = mapped_column(String(32))
+
+
 class User(Base):
     __tablename__ = "users"
 

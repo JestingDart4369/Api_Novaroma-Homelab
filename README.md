@@ -93,7 +93,8 @@ Copy `.env.example` to `.env` and configure. All API keys follow a consistent pa
 #### Core
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `JWT_SECRET` | Secret key for JWT tokens | ✅ |
+| `JWT_SECRET` | Independent random signing secret, at least 32 bytes | ✅ |
+| `PASSWORD_PEPPER` or `PASSWORD_PEPPER_FILE` | Independent random password pepper, at least 32 bytes; configure exactly one source, keep outside Git and back up separately from the DB | ✅ |
 | `BOOTSTRAP_ADMIN_USERNAME` | Initial Root user username (first run only) | ✅ |
 | `BOOTSTRAP_ADMIN_PASSWORD` | Initial Root user password (first run only) | ✅ |
 
@@ -317,16 +318,18 @@ The first user created at bootstrap is automatically assigned the `Root` role.
 
 ## 🛡️ Security
 
-- ✅ **API keys stored server-side only** - Never exposed to clients
-- ✅ **Password hashing** - bcrypt with SHA-256 pre-hash for long passwords
-- ✅ **JWT tokens** - Expire after 1 hour
-- ✅ **4-level RBAC** - user / admin / superAdmin / Root with clear permission boundaries
-- ✅ **Rate limiting** - Per-user (role-based) and per-API quotas
-- ✅ **Input validation** - Comprehensive validation on all endpoints
-- ✅ **Audit logging** - All user actions logged for security
-- ✅ **Self-modification guards** - Users cannot disable or delete their own account
-- ✅ **Environment isolation** - All secrets in `.env` (gitignored)
-- ✅ **Email alerts** - Admin notified of startup failures and critical errors
+Before deploying, follow the **[security hardening and migration checklist](legacy/docs/SECURITY_HARDENING.md)**. These changes have not been deployed automatically; this is not a guarantee that the service has no vulnerabilities.
+
+- **API keys** - Stored server-side; restrict log access and redact infrastructure logs.
+- **Password hashing** - Argon2id with a random per-password salt and separate HMAC pepper; legacy bcrypt hashes migrate on successful login.
+- **JWT tokens** - One-hour maximum lifetime, required claims, and credential/state-bound revocation.
+- **4-level RBAC** - Non-Root administrators may manage only strictly lower-ranked accounts.
+- **Login throttling** - Persistent budgets of 10/account and 50/socket peer per 15-minute fixed window, before password hashing. Tunnel clients share the source budget.
+- **Authenticated API quotas** - Per-user and per-API counters remain in-memory/per-worker.
+- **Validation/errors** - Sensitive input and provider details are omitted from handled errors; see the checklist for remaining limitations.
+- **Audit/logging** - A central action audit trail is not implemented. Access logs are disabled while legacy Grade credentials remain in URLs.
+- **Secrets** - Keep environment values and secret files outside Git; back up the password pepper separately from the database.
+- **Release requirements** - Existing JWTs require re-login; image-only rollback cannot verify migrated Argon2id passwords. Review the documented backup/rollback procedure and residual risks.
 
 ---
 
