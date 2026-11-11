@@ -3,6 +3,7 @@ import sys
 import httpx
 from pathlib import Path
 from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -36,8 +37,8 @@ app = FastAPI(
     title="API Gateway",
     description="Centralized API proxy with rate limiting for weather, geocoding, location, telephone directory, NASA space data, Open Library book services, and iOS automation (Pushcut) | © 2026 JestingDart4369",
     version="1.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc"
+    docs_url=None,
+    redoc_url=None
 )
 
 
@@ -113,6 +114,28 @@ def initialize_server():
 
 # Initialize server on startup
 initialize_server()
+
+FONT_LINK = '<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap" rel="stylesheet">'
+
+# Swagger UI / ReDoc with the Nova Roma design system
+@app.get("/docs", response_class=HTMLResponse, include_in_schema=False)
+async def swagger_docs():
+    css = (Path(__file__).parent / "templates" / "swagger-novaroma.css").read_text(encoding="utf-8")
+    page = get_swagger_ui_html(openapi_url=app.openapi_url, title="Novaroma API Gateway - Docs").body.decode()
+    return page.replace("</head>", f"{FONT_LINK}<style>{css}</style></head>", 1)
+
+REDOC_THEME = (
+    "{&quot;typography&quot;:{&quot;fontFamily&quot;:&quot;Roboto, sans-serif&quot;,&quot;headings&quot;:{&quot;fontFamily&quot;:&quot;Roboto, sans-serif&quot;}},"
+    "&quot;colors&quot;:{&quot;primary&quot;:{&quot;main&quot;:&quot;#5e282c&quot;},&quot;text&quot;:{&quot;primary&quot;:&quot;#190607&quot;}},"
+    "&quot;sidebar&quot;:{&quot;backgroundColor&quot;:&quot;#eee3c9&quot;,&quot;textColor&quot;:&quot;#190607&quot;},"
+    "&quot;rightPanel&quot;:{&quot;backgroundColor&quot;:&quot;#5e282c&quot;}}"
+)
+
+@app.get("/redoc", response_class=HTMLResponse, include_in_schema=False)
+async def redoc_docs():
+    page = get_redoc_html(openapi_url=app.openapi_url, title="Novaroma API Gateway - ReDoc").body.decode()
+    page = page.replace("<redoc ", f'<redoc theme="{REDOC_THEME}" ', 1)
+    return page.replace("</head>", f"{FONT_LINK}<style>body{{background:#f6f7fb}}</style></head>", 1)
 
 #The main Page
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
