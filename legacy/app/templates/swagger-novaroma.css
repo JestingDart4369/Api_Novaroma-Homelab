@@ -431,3 +431,71 @@ body {
 .swagger-ui .expand-operation svg {
   fill: var(--nr-main) !important;
 }
+
+/* Header with logo and season badge */
+.nr-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  border-bottom: var(--nr-line) solid var(--nr-main);
+  background: var(--nr-bg);
+  font-family: var(--nr-font-sans);
+}
+
+.nr-header img {
+  height: 48px;
+  width: 48px;
+  border-radius: var(--nr-radius-sm);
+}
+
+.nr-title {
+  color: var(--nr-text);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.nr-sub {
+  color: var(--nr-muted);
+  font-size: 0.75rem;
+}
+
+.nr-season {
+  margin-left: auto;
+  background: var(--nr-season);
+  color: var(--nr-main);
+  border: var(--nr-line) solid var(--nr-main);
+  border-radius: var(--nr-radius-pill);
+  padding: 0.4rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.swagger-ui .opblock-tag:hover,
+.swagger-ui .opblock.opblock-put .opblock-summary-method {
+  background: var(--nr-season) !important;
+}
+
+.swagger-ui .opblock.opblock-put .opblock-summary-method {
+  color: var(--nr-main) !important;
+  border: var(--nr-line) solid var(--nr-main) !important;
+}
+
+/* Seasons: Frühling / Sommer / Herbst / Winter (set by data-season on <html>) */
+:root { --nr-season: #eee3c9; }
+:root[data-season="spring"] { --nr-bg: #fbf3f6; --nr-muted: #8e6271; --nr-season: #f5c2d6; }
+:root[data-season="summer"] { --nr-bg: #fdf8ea; --nr-muted: #836e42; --nr-season: #ffd66b; }
+:root[data-season="autumn"] { --nr-bg: #f8f0e6; --nr-muted: #85664c; --nr-season: #e8a63d; }
+:root[data-season="winter"] { --nr-bg: #f1f5fa; --nr-muted: #5c7084; --nr-season: #bfdcf5; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --nr-season: #6e3338; }
+  :root[data-season="spring"]:not([data-theme="light"]) { --nr-bg: #1f0f14; --nr-muted: #cfa6b6; --nr-season: #6b2c43; }
+  :root[data-season="summer"]:not([data-theme="light"]) { --nr-bg: #1d1608; --nr-muted: #cdb67e; --nr-season: #5a4510; }
+  :root[data-season="autumn"]:not([data-theme="light"]) { --nr-bg: #1d1109; --nr-muted: #cfa883; --nr-season: #6a4513; }
+  :root[data-season="winter"]:not([data-theme="light"]) { --nr-bg: #0e1620; --nr-muted: #9db6cc; --nr-season: #25405c; }
+}
+
+@media (max-width: 768px) {
+  .nr-header { padding: 1rem; }
+}

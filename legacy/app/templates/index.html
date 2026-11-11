@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Novaroma API Gateway</title>
     <meta name="color-scheme" content="light dark">
+    <link rel="icon" type="image/webp" href="/logo.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap" rel="stylesheet">
@@ -120,6 +121,33 @@
             font-size: 0.9rem;
             font-weight: 600;
             z-index: 1000;
+        }
+
+        .site-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0 0 1rem;
+            margin-bottom: 2rem;
+            border-bottom: var(--line) solid var(--main);
+        }
+
+        .site-header img {
+            height: 48px;
+            width: 48px;
+            border-radius: 6px;
+        }
+
+        .site-title {
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .site-sub {
+            color: var(--muted);
+            font-size: 0.75rem;
         }
 
         .header,
@@ -363,6 +391,14 @@
     <div class="season-indicator" id="seasonIndicator">Herbst</div>
 
     <div class="container">
+        <div class="site-header">
+            <img src="/logo.webp" alt="Novaroma Logo" width="48" height="48">
+            <div>
+                <div class="site-title">Novaroma-Homelab</div>
+                <div class="site-sub">JestingDart4369</div>
+            </div>
+        </div>
+
         <div class="header">
             <h1>API Gateway</h1>
             <p>Centralized API proxy for weather, location, telephone, NASA, books, email, iOS automation, and grade tracking — with 4-level role-based access control</p>
