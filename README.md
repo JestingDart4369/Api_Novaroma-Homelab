@@ -127,6 +127,7 @@ Copy `.env.example` to `.env` and configure. All API keys follow a consistent pa
 | `SENDER_DOMAIN` | Verified domain for senders (must be verified in Resend) | ✅ |
 | `CLOUDFLARE_TUNNEL_TOKEN` | Cloudflare Tunnel token | Optional |
 | `DB_URL` | SQLAlchemy DB URL (defaults to `./data/gateway.db`) | Optional |
+| `CORS_ALLOWED_ORIGINS` | Comma-separated exact origins allowed to call the API from a browser. Default: `https://novaroma-homelab.uk,https://svenja.novaroma-homelab.uk`. No wildcards or paths; set empty to disable CORS. Only `GET`, `POST` and `OPTIONS` are allowed cross-origin, credentials (cookies) are never sent | Optional |
 
 **⚠️ NEVER commit `.env` to Git!** It's already in `.gitignore`.
 
