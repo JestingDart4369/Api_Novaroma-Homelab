@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Gateway Documentation</title>
+    <title>Novaroma API Gateway</title>
+    <meta name="color-scheme" content="light dark">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,62 +15,91 @@
             box-sizing: border-box;
         }
 
+        /* Nova Roma design system — Standard theme (light) */
         :root {
-            --primary: #D97706;
-            --primary-light: #FCD34D;
-            --primary-dark: #B45309;
-            --bg-gradient-start: #DC2626;
-            --bg-gradient-end: #EA580C;
-            --accent: #F59E0B;
+            --bg: #f6f7fb;
+            --main: #5e282c;
+            --text: #190607;
+            --accent: #eee3c9;
+            --muted: #7e6e56;
+            --season: #eee3c9;
+            --season-ink: #886c2b;
+            --btn-pressed: #451d20;
+            --line: 2px;
+            --hairline: 1px;
+            --radius-pill: 999px;
+            --radius-section: 26px;
+            --radius-card: 21px;
+            --radius-item: 12px;
+            --radius-code: 4px;
+            --font-sans: Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            /* aliases used by inline styles */
+            --primary: var(--main);
         }
 
-        /* Spring theme (March-May) */
+        /* Frühling (March-May) */
         body.spring {
-            --primary: #10B981;
-            --primary-light: #6EE7B7;
-            --primary-dark: #047857;
-            --bg-gradient-start: #059669;
-            --bg-gradient-end: #10B981;
-            --accent: #34D399;
+            --bg: #fbf3f6;
+            --muted: #8e6271;
+            --season: #f5c2d6;
+            --season-ink: #d02267;
         }
 
-        /* Summer theme (June-August) */
+        /* Sommer (June-August) */
         body.summer {
-            --primary: #3B82F6;
-            --primary-light: #93C5FD;
-            --primary-dark: #1E40AF;
-            --bg-gradient-start: #0EA5E9;
-            --bg-gradient-end: #8B5CF6;
-            --accent: #06B6D4;
+            --bg: #fdf8ea;
+            --muted: #836e42;
+            --season: #ffd66b;
+            --season-ink: #916900;
         }
 
-        /* Autumn theme (September-November) */
+        /* Herbst (September-November) */
         body.autumn {
-            --primary: #D97706;
-            --primary-light: #FCD34D;
-            --primary-dark: #B45309;
-            --bg-gradient-start: #DC2626;
-            --bg-gradient-end: #EA580C;
-            --accent: #F59E0B;
+            --bg: #f8f0e6;
+            --muted: #85664c;
+            --season: #e8a63d;
+            --season-ink: #946212;
         }
 
-        /* Winter theme (December-February) */
+        /* Winter (December-February) */
         body.winter {
-            --primary: #06B6D4;
-            --primary-light: #A5F3FC;
-            --primary-dark: #0E7490;
-            --bg-gradient-start: #0891B2;
-            --bg-gradient-end: #6366F1;
-            --accent: #38BDF8;
+            --bg: #f1f5fa;
+            --muted: #5c7084;
+            --season: #bfdcf5;
+            --season-ink: #1d71b9;
+        }
+
+        /* Dark: the brand inverted, seasons override bg / muted / season / season-ink */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1b0e0f;
+                --main: #eee3c9;
+                --text: #fff8ea;
+                --accent: #6e3338;
+                --muted: #b7a68b;
+                --season: #6e3338;
+                --season-ink: #eee3c9;
+                --btn-pressed: #cfc2a3;
+            }
+            body.spring { --bg: #1f0f14; --muted: #cfa6b6; --season: #6b2c43; --season-ink: #f29bbb; }
+            body.summer { --bg: #1d1608; --muted: #cdb67e; --season: #5a4510; --season-ink: #f5cf5f; }
+            body.autumn { --bg: #1d1109; --muted: #cfa883; --season: #6a4513; --season-ink: #eeb25a; }
+            body.winter { --bg: #0e1620; --muted: #9db6cc; --season: #25405c; --season-ink: #8dc2ee; }
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: var(--font-sans);
             line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: var(--main);
+            background: var(--bg);
             min-height: 100vh;
-            transition: background 0.5s ease;
+        }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline: 3px solid var(--text);
+            outline-offset: 2px;
         }
 
         .container {
@@ -79,140 +112,135 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            background: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            background: var(--season);
+            color: var(--main);
+            padding: 0.4rem 1.2rem;
+            border: var(--line) solid var(--main);
+            border-radius: var(--radius-pill);
             font-size: 0.9rem;
             font-weight: 600;
-            color: var(--primary);
             z-index: 1000;
         }
 
-        .header {
-            background: white;
-            border-radius: 10px;
-            padding: 2rem;
+        .header,
+        .content,
+        .footer {
+            background: var(--bg);
+            border: var(--line) solid var(--accent);
+            border-radius: var(--radius-section);
+            padding: 1.5rem;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            animation: fadeInUp 0.6s ease;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .header {
+            border-bottom-color: var(--accent);
         }
 
         .header h1 {
-            color: var(--primary);
+            color: var(--text);
             font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 0.75rem;
         }
 
         .header p {
-            color: #666;
-            font-size: 1.1rem;
+            color: var(--main);
+            font-size: 1rem;
+            line-height: 1.7;
         }
 
         .header p strong {
-            color: var(--primary-dark);
-        }
-
-        .content {
-            background: white;
-            border-radius: 10px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            animation: fadeInUp 0.6s ease;
+            color: var(--text);
         }
 
         .endpoint {
-            background: #f8f9fa;
-            border-left: 4px solid var(--primary);
+            background: var(--bg);
+            border: var(--line) solid var(--accent);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            border-radius: 5px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-radius: var(--radius-card);
+            transition: border-color 0.2s ease;
         }
 
         .endpoint:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-color: var(--main);
         }
 
         .endpoint h3 {
-            color: var(--primary);
+            color: var(--text);
+            font-size: 1rem;
             margin-bottom: 0.5rem;
         }
 
         .method {
             display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.875rem;
+            padding: 0.2rem 0.8rem;
+            border: var(--line) solid var(--main);
+            border-radius: var(--radius-pill);
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 0.04em;
             margin-right: 0.5rem;
         }
 
         .method.get {
-            background: var(--accent);
-            color: white;
+            background: var(--main);
+            color: var(--bg);
         }
 
         .method.post {
-            background: var(--primary-dark);
-            color: white;
+            background: var(--accent);
+            color: var(--main);
         }
 
         .method.put {
-            background: #7C3AED;
-            color: white;
-        }
-
-        .method.delete {
-            background: #DC2626;
-            color: white;
+            background: var(--season);
+            color: var(--main);
         }
 
         .method.patch {
-            background: #D97706;
-            color: white;
+            background: var(--bg);
+            color: var(--main);
+        }
+
+        .method.delete {
+            background: var(--btn-pressed);
+            border-color: var(--btn-pressed);
+            color: var(--bg);
         }
 
         .endpoint-path {
-            font-family: 'Courier New', monospace;
-            color: #555;
-            font-size: 1.1rem;
+            font-family: var(--font-mono);
+            color: var(--text);
+            font-size: 0.95rem;
         }
 
         .description {
             margin-top: 0.75rem;
-            color: #666;
+            color: var(--muted);
+            font-size: 0.9rem;
         }
 
         .params {
             margin-top: 1rem;
             padding: 1rem;
-            background: white;
-            border-radius: 4px;
+            background: var(--bg);
+            border: var(--hairline) solid var(--accent);
+            border-radius: var(--radius-item);
         }
 
         .params h4 {
-            color: #333;
+            color: var(--text);
             margin-bottom: 0.5rem;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         .param {
             padding: 0.5rem 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: var(--hairline) solid var(--accent);
         }
 
         .param:last-child {
@@ -220,63 +248,60 @@
         }
 
         .param-name {
-            font-family: 'Courier New', monospace;
-            color: var(--primary);
-            font-weight: bold;
+            font-family: var(--font-mono);
+            color: var(--text);
+            font-weight: 700;
         }
 
         .param-required {
-            color: #dc3545;
+            color: var(--season-ink);
             font-size: 0.8rem;
+            font-weight: 700;
             margin-left: 0.5rem;
         }
 
         .section-title {
-            color: var(--primary);
-            font-size: 1.8rem;
+            color: var(--text);
+            font-size: 1.3rem;
+            font-weight: 700;
             margin-bottom: 1.5rem;
             padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--primary);
+            border-bottom: var(--line) solid var(--main);
         }
 
         .role-badge {
             display: inline-block;
-            padding: 0.15rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.8rem;
+            padding: 0.1rem 0.7rem;
+            border: var(--hairline) solid var(--main);
+            border-radius: var(--radius-pill);
+            font-size: 0.75rem;
             font-weight: 600;
             margin-left: 0.5rem;
         }
 
-        .role-admin { background: #DBEAFE; color: #1E40AF; }
-        .role-super { background: #EDE9FE; color: #7C3AED; }
-        .role-root  { background: #FEE2E2; color: #DC2626; }
+        .role-admin { background: var(--accent); color: var(--main); }
+        .role-super { background: var(--season); color: var(--main); }
+        .role-root  { background: var(--main); color: var(--bg); }
 
         .footer {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            color: #666;
-            animation: fadeInUp 0.6s ease;
+            color: var(--main);
+            font-size: 0.8rem;
         }
 
         .footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: bold;
+            color: var(--main);
+            font-weight: 700;
             transition: color 0.2s ease;
         }
 
         .footer a:hover {
-            color: var(--primary-dark);
-            text-decoration: underline;
+            color: var(--muted);
         }
 
         .quick-links {
             display: flex;
-            gap: 1rem;
+            gap: 1.5rem;
             margin-bottom: 2rem;
             flex-wrap: wrap;
         }
@@ -284,34 +309,35 @@
         .quick-link {
             flex: 1;
             min-width: 250px;
-            background: white;
+            background: var(--bg);
             padding: 1.5rem;
-            border-radius: 8px;
+            border: var(--line) solid var(--accent);
+            border-radius: var(--radius-card);
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             text-decoration: none;
-            color: #333;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            animation: fadeInUp 0.6s ease;
+            color: var(--muted);
+            transition: border-color 0.2s ease, background-color 0.2s ease;
         }
 
         .quick-link:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            border-color: var(--main);
+            background: var(--season);
+            color: var(--main);
         }
 
         .quick-link h3 {
-            color: var(--primary);
+            color: var(--text);
+            font-size: 1rem;
             margin-bottom: 0.5rem;
         }
 
         code {
-            background: #f4f4f4;
-            padding: 0.2rem 0.4rem;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            color: var(--primary-dark);
+            background: var(--accent);
+            padding: 0.1rem 0.4rem;
+            border-radius: var(--radius-code);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--main);
         }
 
         @media (max-width: 768px) {
@@ -320,7 +346,7 @@
             }
 
             .header h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
 
             .quick-links {
@@ -334,26 +360,26 @@
     </style>
 </head>
 <body>
-    <div class="season-indicator" id="seasonIndicator">🍂 Autumn</div>
+    <div class="season-indicator" id="seasonIndicator">Herbst</div>
 
     <div class="container">
         <div class="header">
-            <h1>🚀 API Gateway</h1>
+            <h1>API Gateway</h1>
             <p>Centralized API proxy for weather, location, telephone, NASA, books, email, iOS automation, and grade tracking — with 4-level role-based access control</p>
             <p><strong>Base URL:</strong> <code>https://api.novaroma-homelab.uk</code></p>
         </div>
 
         <div class="quick-links">
             <a href="/docs" class="quick-link">
-                <h3>📖 Swagger UI</h3>
+                <h3>Swagger UI</h3>
                 <p>Try out endpoints interactively</p>
             </a>
             <a href="/redoc" class="quick-link">
-                <h3>📚 ReDoc</h3>
+                <h3>ReDoc</h3>
                 <p>Detailed API reference</p>
             </a>
             <a href="/health" class="quick-link">
-                <h3>✅ Health Check</h3>
+                <h3>Health Check</h3>
                 <p>Check API status</p>
             </a>
         </div>
@@ -796,7 +822,7 @@
         <!-- ============================================================ -->
         <div class="content">
             <h2 class="section-title">Rate Limits</h2>
-            <p style="color: #666; margin-bottom: 1rem;">
+            <p style="color: var(--muted); margin-bottom: 1rem;">
                 Every request is rate-limited at two layers: your <strong>role limit</strong> (requests / hour) and per-<strong>API quota</strong> (shared across all users). Current limits are returned in <code>X-RateLimit-*</code> response headers.
             </p>
 
@@ -837,31 +863,31 @@
         <!-- ============================================================ -->
         <div class="content">
             <h2 class="section-title">Health Monitoring</h2>
-            <p style="color: #666; margin-bottom: 1rem;">
+            <p style="color: var(--muted); margin-bottom: 1rem;">
                 Push-based health monitoring for custom software and hardware. Devices call in their own status via heartbeat endpoints, and clients read the aggregated health dashboard. Supports a <strong>three-tier control system</strong> for flexible device management.
             </p>
 
             <!-- Three-tier control explanation -->
-            <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                <h3 style="color: #333; margin-bottom: 1rem; font-size: 1.1rem;">🎯 Three-Tier Control System</h3>
+            <div style="border: var(--line) solid var(--accent); padding: 1.5rem; border-radius: var(--radius-card); margin-bottom: 1.5rem;">
+                <h3 style="color: var(--text); margin-bottom: 1rem; font-size: 1.1rem;">Three-Tier Control System</h3>
                 <div style="margin-left: 1rem;">
                     <p style="margin-bottom: 0.75rem;">
-                        <strong style="color: var(--primary);">1. server_enabled</strong> (Hard Block)
-                        <br><span style="color: #666; font-size: 0.95rem;">Server-side API blocking. When false → 503 response, nothing gets through. Complete shutdown.</span>
+                        <strong style="color: var(--text);">1. server_enabled</strong> (Hard Block)
+                        <br><span style="color: var(--muted); font-size: 0.95rem;">Server-side API blocking. When false → 503 response, nothing gets through. Complete shutdown.</span>
                     </p>
                     <p style="margin-bottom: 0.75rem;">
-                        <strong style="color: var(--primary);">2. is_active</strong> (Soft Signal)
-                        <br><span style="color: #666; font-size: 0.95rem;">Device-side signal. Device sees this in heartbeat response and can stop itself. Heartbeats still transmit.</span>
+                        <strong style="color: var(--text);">2. is_active</strong> (Soft Signal)
+                        <br><span style="color: var(--muted); font-size: 0.95rem;">Device-side signal. Device sees this in heartbeat response and can stop itself. Heartbeats still transmit.</span>
                     </p>
                     <p style="margin-bottom: 0;">
-                        <strong style="color: var(--primary);">3. health</strong> (Self-Report)
-                        <br><span style="color: #666; font-size: 0.95rem;">Device reports own status: <code>ok</code>, <code>warning</code>, <code>error</code>, or <code>killed</code>. Full client control.</span>
+                        <strong style="color: var(--text);">3. health</strong> (Self-Report)
+                        <br><span style="color: var(--muted); font-size: 0.95rem;">Device reports own status: <code>ok</code>, <code>warning</code>, <code>error</code>, or <code>killed</code>. Full client control.</span>
                     </p>
                 </div>
             </div>
 
             <!-- Software Health -->
-            <h3 style="color: #555; margin-bottom: 1rem; font-size: 1.2rem;">💻 Software Health</h3>
+            <h3 style="color: var(--text); margin-bottom: 1rem; font-size: 1.2rem;">Software Health</h3>
 
             <div class="endpoint">
                 <h3>
@@ -906,7 +932,7 @@
             </div>
 
             <!-- Hardware Health -->
-            <h3 style="color: #555; margin: 1.5rem 0 1rem; font-size: 1.2rem;">🔧 Hardware Health</h3>
+            <h3 style="color: var(--text); margin: 1.5rem 0 1rem; font-size: 1.2rem;">Hardware Health</h3>
 
             <div class="endpoint">
                 <h3>
@@ -960,13 +986,13 @@
         <!-- ============================================================ -->
         <div class="content">
             <h2 class="section-title">Grades</h2>
-            <p style="color: #666; margin-bottom: 1rem;">
+            <p style="color: var(--muted); margin-bottom: 1rem;">
                 Proxy for the <a href="https://api.sercraft.ch/documentation" target="_blank">sercraft.ch Grade Tracker API</a>.
                 Login first to get an <code>X-Grade-Token</code>, then include it in all subsequent grade requests.
             </p>
 
             <!-- User Account -->
-            <h3 style="color: #555; margin-bottom: 1rem; font-size: 1.2rem;">👤 Account</h3>
+            <h3 style="color: var(--text); margin-bottom: 1rem; font-size: 1.2rem;">Account</h3>
 
             <div class="endpoint">
                 <h3>
@@ -1033,7 +1059,7 @@
             </div>
 
             <!-- Subjects -->
-            <h3 style="color: #555; margin: 1.5rem 0 1rem; font-size: 1.2rem;">📚 Subjects</h3>
+            <h3 style="color: var(--text); margin: 1.5rem 0 1rem; font-size: 1.2rem;">Subjects</h3>
 
             <div class="endpoint">
                 <h3>
@@ -1095,7 +1121,7 @@
             </div>
 
             <!-- Exams -->
-            <h3 style="color: #555; margin: 1.5rem 0 1rem; font-size: 1.2rem;">📝 Exams</h3>
+            <h3 style="color: var(--text); margin: 1.5rem 0 1rem; font-size: 1.2rem;">Exams</h3>
 
             <div class="endpoint">
                 <h3>
@@ -1162,12 +1188,12 @@
         <!-- ============================================================ -->
         <div class="content">
             <h2 class="section-title">Settings</h2>
-            <p style="color: #666; margin-bottom: 1rem;">
+            <p style="color: var(--muted); margin-bottom: 1rem;">
                 Live configuration — changes take effect immediately, no server restart needed. Role badges show the <em>minimum</em> role required.
             </p>
 
             <!-- Users -->
-            <h3 style="color: #555; margin-bottom: 1rem; font-size: 1.2rem;">👤 Users</h3>
+            <h3 style="color: var(--text); margin-bottom: 1rem; font-size: 1.2rem;">Users</h3>
 
             <div class="endpoint">
                 <h3>
@@ -1250,7 +1276,7 @@
             </div>
 
             <!-- APIs -->
-            <h3 style="color: #555; margin: 1.5rem 0 1rem; font-size: 1.2rem;">⚙️ APIs</h3>
+            <h3 style="color: var(--text); margin: 1.5rem 0 1rem; font-size: 1.2rem;">APIs</h3>
 
             <div class="endpoint">
                 <h3>
@@ -1291,7 +1317,7 @@
             </div>
 
             <!-- Roles -->
-            <h3 style="color: #555; margin: 1.5rem 0 1rem; font-size: 1.2rem;">🛡️ Roles</h3>
+            <h3 style="color: var(--text); margin: 1.5rem 0 1rem; font-size: 1.2rem;">Roles</h3>
 
             <div class="endpoint">
                 <h3>
@@ -1323,7 +1349,7 @@
             </div>
 
             <!-- Software Settings -->
-            <h3 style="color: #555; margin: 1.5rem 0 1rem; font-size: 1.2rem;">💻 Software</h3>
+            <h3 style="color: var(--text); margin: 1.5rem 0 1rem; font-size: 1.2rem;">Software</h3>
 
             <div class="endpoint">
                 <h3>
@@ -1381,7 +1407,7 @@
             </div>
 
             <!-- Hardware Settings -->
-            <h3 style="color: #555; margin: 1.5rem 0 1rem; font-size: 1.2rem;">🔧 Hardware</h3>
+            <h3 style="color: var(--text); margin: 1.5rem 0 1rem; font-size: 1.2rem;">Hardware</h3>
 
             <div class="endpoint">
                 <h3>
@@ -1467,25 +1493,24 @@
     <script>
         function applySeason() {
             const month = new Date().getMonth() + 1;
-            let season, emoji;
+            let season, label;
 
             if (month >= 3 && month <= 5) {
                 season = 'spring';
-                emoji = '🌸';
+                label = 'Frühling';
             } else if (month >= 6 && month <= 8) {
                 season = 'summer';
-                emoji = '☀️';
+                label = 'Sommer';
             } else if (month >= 9 && month <= 11) {
                 season = 'autumn';
-                emoji = '🍂';
+                label = 'Herbst';
             } else {
                 season = 'winter';
-                emoji = '❄️';
+                label = 'Winter';
             }
 
             document.body.className = season;
-            document.getElementById('seasonIndicator').textContent =
-                `${emoji} ${season.charAt(0).toUpperCase() + season.slice(1)}`;
+            document.getElementById('seasonIndicator').textContent = label;
         }
 
         applySeason();
