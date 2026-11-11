@@ -3,7 +3,9 @@ import sys
 import httpx
 from pathlib import Path
 from fastapi import FastAPI, Depends, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from fastapi.openapi.utils import get_openapi
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -36,8 +38,8 @@ app = FastAPI(
     title="API Gateway",
     description="Centralized API proxy with rate limiting for weather, geocoding, location, telephone directory, NASA space data, Open Library book services, and iOS automation (Pushcut) | © 2026 JestingDart4369",
     version="1.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc"
+    docs_url=None,
+    redoc_url=None
 )
 
 
@@ -113,6 +115,92 @@ def initialize_server():
 
 # Initialize server on startup
 initialize_server()
+
+FONT_LINK = '<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap" rel="stylesheet">'
+ICON_LINK = '<link rel="icon" type="image/webp" href="/logo.webp">'
+
+# Logo from the Nova Roma design system (header, favicon, ReDoc sidebar)
+@app.get("/logo.webp", include_in_schema=False)
+async def logo():
+    return FileResponse(
+        Path(__file__).parent / "static" / "nova-roma-logo-256.webp",
+        media_type="image/webp",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    schema = get_openapi(title=app.title, version=app.version, description=app.description, routes=app.routes)
+    schema["info"]["x-logo"] = {"url": "/logo.webp", "altText": "Novaroma Logo", "backgroundColor": "#eee3c9"}
+    app.openapi_schema = schema
+    return schema
+
+app.openapi = custom_openapi
+
+SEASON_JS = """
+function novaromaSeason() {
+    var m = new Date().getMonth() + 1;
+    if (m >= 3 && m <= 5) return ['spring', 'Frühling'];
+    if (m >= 6 && m <= 8) return ['summer', 'Sommer'];
+    if (m >= 9 && m <= 11) return ['autumn', 'Herbst'];
+    return ['winter', 'Winter'];
+}
+"""
+
+SWAGGER_HEADER = (
+    '<header class="nr-header">'
+    '<img src="/logo.webp" alt="Novaroma Logo" width="48" height="48">'
+    '<div><div class="nr-title">Novaroma-Homelab</div><div class="nr-sub">API Docs</div></div>'
+    '<span class="nr-season" id="nr-season"></span></header>'
+    '<script>' + SEASON_JS +
+    'var s = novaromaSeason(); document.documentElement.dataset.season = s[0];'
+    'document.getElementById("nr-season").textContent = s[1];</script>'
+)
+
+# Swagger UI / ReDoc with the Nova Roma design system
+@app.get("/docs", response_class=HTMLResponse, include_in_schema=False)
+async def swagger_docs():
+    css = (Path(__file__).parent / "templates" / "swagger-novaroma.css").read_text(encoding="utf-8")
+    page = get_swagger_ui_html(openapi_url=app.openapi_url, title="Novaroma API Gateway - Docs").body.decode()
+    page = page.replace("</head>", f"{ICON_LINK}{FONT_LINK}<style>{css}</style></head>", 1)
+    return page.replace("<body>", f"<body>{SWAGGER_HEADER}", 1)
+
+REDOC_JS = "<script>" + SEASON_JS + """
+(function () {
+    var s = novaromaSeason()[0];
+    var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var light = {
+        spring: ['#fbf3f6', '#8e6271'], summer: ['#fdf8ea', '#836e42'],
+        autumn: ['#f8f0e6', '#85664c'], winter: ['#f1f5fa', '#5c7084']
+    };
+    var night = {
+        spring: ['#1f0f14', '#cfa6b6'], summer: ['#1d1608', '#cdb67e'],
+        autumn: ['#1d1109', '#cfa883'], winter: ['#0e1620', '#9db6cc']
+    };
+    var p = (dark ? night : light)[s];
+    var main = dark ? '#eee3c9' : '#5e282c';
+    var text = dark ? '#fff8ea' : '#190607';
+    var accent = dark ? '#6e3338' : '#eee3c9';
+    var font = 'Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    var theme = {
+        typography: { fontFamily: font, headings: { fontFamily: font }, code: { fontFamily: 'monospace' } },
+        colors: { primary: { main: main }, text: { primary: text, secondary: p[1] } },
+        sidebar: { backgroundColor: accent, textColor: text },
+        rightPanel: { backgroundColor: dark ? '#120808' : '#5e282c', textColor: '#eee3c9' }
+    };
+    document.querySelector('redoc').setAttribute('theme', JSON.stringify(theme));
+    var css = document.createElement('style');
+    css.textContent = 'body{background:' + p[0] + ';margin:0}.api-content{background:' + p[0] + '}';
+    document.head.appendChild(css);
+})();
+</script>"""
+
+@app.get("/redoc", response_class=HTMLResponse, include_in_schema=False)
+async def redoc_docs():
+    page = get_redoc_html(openapi_url=app.openapi_url, title="Novaroma API Gateway - ReDoc").body.decode()
+    page = page.replace("</head>", f"{ICON_LINK}{FONT_LINK}</head>", 1)
+    return page.replace("</redoc>", f"</redoc>{REDOC_JS}", 1)
 
 #The main Page
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
