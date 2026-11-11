@@ -1,5 +1,9 @@
 import os
+from pathlib import Path
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from fastapi.responses import HTMLResponse
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
@@ -13,7 +17,33 @@ from app.routes.weather import router as weather_router
 from app.routes.geocode import router as geocode_router
 from app.routes.users import router as users_router
 
-app = FastAPI(title="API Gateway")
+app = FastAPI(
+    title="Novaroma API Gateway",
+    description="API Gateway for Novaroma Homelab — proxies external APIs with JWT authentication.",
+    version="1.0.0",
+    docs_url=None,
+    redoc_url=None,
+)
+
+static_dir = Path(__file__).parent / "static"
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=f"{app.title} — Docs",
+        swagger_css_url="/static/swagger-novaroma.css",
+        swagger_favicon_url="",
+    )
+
+@app.get("/redoc", include_in_schema=False)
+async def custom_redoc_html():
+    return get_redoc_html(
+        openapi_url=app.openapi_url,
+        title=f"{app.title} — ReDoc",
+        redoc_favicon_url="",
+    )
 
 # Create tables
 Base.metadata.create_all(bind=engine)
