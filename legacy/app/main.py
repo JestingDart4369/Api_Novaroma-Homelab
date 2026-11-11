@@ -5,6 +5,7 @@ from pathlib import Path
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
@@ -28,6 +29,7 @@ from app.routes.hardware import router as hardware_router
 from app.routes.rate_limits import router as rate_limits_router
 from app.routes.pushcut import router as pushcut_router
 from app.rate_limit import add_rate_limit_headers
+from app.cors import allowed_origins
 from app.routes.Grade import router as grade_router
 
 app = FastAPI(
@@ -142,6 +144,20 @@ def login(body: dict, request: Request, db: Session = Depends(get_db)):
 # MIDDLEWARE
 # ============================================================
 app.middleware("http")(add_rate_limit_headers)
+
+# Added last so it is the outermost layer and answers preflight requests before anything else.
+# Auth is a Bearer header (no cookies), so credentials stay disabled.
+_cors_origins = allowed_origins()
+if _cors_origins:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=_cors_origins,
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type"],
+        expose_headers=["X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset"],
+        max_age=600,
+    )
 
 # ============================================================
 # ROUTERS

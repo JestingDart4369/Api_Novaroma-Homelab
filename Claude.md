@@ -28,6 +28,7 @@ app/
 ├── auth.py          # JWT creation/decoding, password hashing (SHA-256 pre-hash + bcrypt)
 ├── security.py      # Bearer token extraction, get_current_user, require_admin, require_super_admin, require_root
 ├── notifications.py # Email alerts for server errors and critical events
+├── cors.py          # CORS origin allowlist (CORS_ALLOWED_ORIGINS), no wildcards
 ├── rate_limit.py    # Per-user and per-API rate limiting (in-memory store, DB-backed limits)
 ├── templates/
 │   └── index.html   # Documentation homepage with seasonal themes
