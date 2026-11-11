@@ -3,7 +3,7 @@ from pathlib import Path
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
@@ -27,6 +27,10 @@ app = FastAPI(
 
 static_dir = Path(__file__).parent / "static"
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+@app.get("/", include_in_schema=False)
+async def index():
+    return FileResponse(static_dir / "index.html")
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
